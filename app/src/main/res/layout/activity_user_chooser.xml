@@ -41,7 +41,7 @@
             style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@id/action_login_skip"
+            android:layout_above="@+id/action_login_skip"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:background="@color/colorPrimary"
             android:text="@string/action_donor_login"
