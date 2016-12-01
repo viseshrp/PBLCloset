@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
+        android:name=".PBLApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -23,9 +24,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.activity.UserChooserActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".ui.activity.LoginActivity"
-            android:label="@string/title_activity_login"></activity>
+            android:exported="true"
+            android:label="@string/title_activity_login"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
