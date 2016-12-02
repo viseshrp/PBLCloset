@@ -10,6 +10,15 @@ public class Item extends BaseModel {
     @SerializedName("itemId")
     private String itemId;
 
+    @SerializedName("catId")
+    private String catId;
+
+    @SerializedName("categGender")
+    private String categGender;
+
+    @SerializedName("categDescription")
+    private String categDescription;
+
     @SerializedName("description")
     private String description;
 
@@ -25,14 +34,14 @@ public class Item extends BaseModel {
     @SerializedName("brand")
     private String brand;
 
-    @SerializedName("dateReceived")
+    @SerializedName("picture")
+    private String picture;
+
+    @SerializedName("receivedDate")
     private String dateReceived;
 
     @SerializedName("donorId")
     private String donorId;
-
-    @SerializedName("picture")
-    private String picture;
 
     @SerializedName("processed")
     private boolean processed;

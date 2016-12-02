@@ -88,7 +88,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @BindView(R.id.sign_up_button)
     Button signupButton;
 
-    @BindView(R.id.signup_done)
+    @BindView(R.id.sign_up_done)
     Button signupDoneButton;
 
     @BindView(R.id.first_name)
