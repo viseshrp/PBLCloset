@@ -24,23 +24,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.activity.PBLAppIntro"
             android:noHistory="true"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activity.UserChooserActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".ui.activity.LoginActivity"
             android:exported="true"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ui.activity.MainActivity" />
+        <activity
+            android:name=".ui.activity.DonorActivity"
+            android:label="@string/title_activity_donor"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
