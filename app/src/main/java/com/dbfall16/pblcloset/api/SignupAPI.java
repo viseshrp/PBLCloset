@@ -12,19 +12,28 @@ import com.dbfall16.pblcloset.utils.APIConstants;
 import java.nio.charset.Charset;
 
 /**
- * Created by viseshprasad on 11/14/16.
+ * Created by viseshprasad on 12/2/16.
  */
 
-public class LoginApi extends AppRequest<User> {
+public class SignupAPI extends AppRequest<User> {
 
-    public LoginApi(String userType, String userName, String password, Response.Listener<User> listener, Response.ErrorListener errorListener) {
-        super(Method.POST, APIConstants.LOGIN, listener, errorListener);
+    public SignupAPI(String userType, String firstName, String lastName, String address, String city, String state,
+                     String zip, String phone, String country, String dob,
+                     Response.Listener<User> listener, Response.ErrorListener errorListener) {
+        super(Method.POST, APIConstants.SIGNUP, listener, errorListener);
         setShouldCache(false);
         setPriority(Request.Priority.IMMEDIATE);
 
         setHttpParams("userType", userType);
-        setHttpParams("userName", userName);
-        setHttpParams("password", password);
+        setHttpParams("firstName", firstName);
+        setHttpParams("lastName", lastName);
+        setHttpParams("address", address);
+        setHttpParams("city", city);
+        setHttpParams("state", state);
+        setHttpParams("zip", zip);
+        setHttpParams("phone", phone);
+        setHttpParams("country", country);
+        setHttpParams("dob", dob);
     }
 
     @Override

@@ -15,5 +15,6 @@ public class UserSessionUtils {
         PreferencesUtils.setString(mContext, AppConstants.EMAIL, response.getEmail());
         PreferencesUtils.setString(mContext, AppConstants.USER_FIRST_NAME, response.getFirstName());
         PreferencesUtils.setString(mContext, AppConstants.USER_LAST_NAME, response.getSecondName());
+        PreferencesUtils.setBoolean(mContext, AppConstants.IS_LOGGED_IN, true);
     }
 }

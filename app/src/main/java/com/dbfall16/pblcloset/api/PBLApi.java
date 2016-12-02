@@ -22,4 +22,10 @@ public class PBLApi {
         return mRequestQueue.add(new LoginApi(userType, email, password, listener, errorListener));
     }
 
+    public Request<?> signup(String userType, String firstName, String lastName, String address, String city, String state,
+                            String zip, String phone, String country, String dob, Response.Listener<User> listener,
+                            Response.ErrorListener errorListener) {
+        return mRequestQueue.add(new SignupAPI(userType, firstName, lastName, address, city, state, zip, phone, country, dob, listener, errorListener));
+    }
+
 }

@@ -13,6 +13,10 @@ public class AppConstants {
     public static int DATA_TYPE_PASSWORD = 1;
     public static int DATA_TYPE_GENERAL_TEXT = 2;
     public static int PASSWORD_MIN_CHARACTER_COUNT = 6;
+    public static int DATA_TYPE_PHONE_NUMBER = 3;
+    public static int DATA_TYPE_OTP = 4;
+    public static int PHONE_NUMBER_MIN_COUNT = 10;
+
 
     /* General User Constants */
     public static final String USER_ID = "user_id";

@@ -39,6 +39,13 @@ public class ValidationUtils {
                 } else {
                     isDataValid = true;
                 }
+            } else if (dataType == AppConstants.DATA_TYPE_PHONE_NUMBER) {
+                if (data.length() < AppConstants.PHONE_NUMBER_MIN_COUNT) {
+                    MsgUtils.displayToast(mContext, R.string.error_phone_number_minimum_required);
+                    isDataValid = false;
+                } else {
+                    isDataValid = true;
+                }
             } else if (dataType == AppConstants.DATA_TYPE_GENERAL_TEXT) {
                 /* Data is not empty */
                 isDataValid = true;

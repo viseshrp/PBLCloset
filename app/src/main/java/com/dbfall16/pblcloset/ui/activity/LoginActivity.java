@@ -30,6 +30,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -47,6 +48,9 @@ import com.dbfall16.pblcloset.utils.PreferencesUtils;
 import com.dbfall16.pblcloset.utils.UserSessionUtils;
 import com.dbfall16.pblcloset.utils.ValidationUtils;
 
+import butterknife.BindView;
+import butterknife.OnClick;
+
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
@@ -63,6 +67,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
+    private UserSignupTask mSignupTask = null;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -73,6 +78,45 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isSuccess;
     private String userType;
+
+    @BindView(R.id.login_form)
+    LinearLayout loginForm;
+
+    @BindView(R.id.signup_form)
+    LinearLayout signupForm;
+
+    @BindView(R.id.sign_up_button)
+    Button signupButton;
+
+    @BindView(R.id.signup_done)
+    Button signupDoneButton;
+
+    @BindView(R.id.first_name)
+    EditText firstNameView;
+
+    @BindView(R.id.second_name)
+    EditText lastNameView;
+
+    @BindView(R.id.address)
+    EditText addressView;
+
+    @BindView(R.id.city)
+    EditText cityView;
+
+    @BindView(R.id.state)
+    EditText stateView;
+
+    @BindView(R.id.zip)
+    EditText zipView;
+
+    @BindView(R.id.phone)
+    EditText phoneView;
+
+    @BindView(R.id.country)
+    EditText countryView;
+
+    @BindView(R.id.dob)
+    EditText dobView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +159,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
+
+    @OnClick(R.id.sign_up_button)
+    void onSignUpClicked() {
+        signupButton.setVisibility(View.GONE);
+        signupForm.setVisibility(View.VISIBLE);
+        signupDoneButton.setVisibility(View.VISIBLE);
+    }
+
+    @OnClick(R.id.sign_up_done)
+    void onSignUpDoneClicked() {
+        attemptSignup();
+    }
+
 
     @Override
     protected void onResume() {
@@ -381,7 +438,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                //TODO : replace with the main activity when available.
                 if (PreferencesUtils.getBoolean(LoginActivity.this, AppConstants.IS_LOGGED_IN, false)) {
                     if (userType.equals(AppConstants.USER_TYPE_DONOR)) {
                         startActivity(new Intent(LoginActivity.this, DonorActivity.class));
@@ -401,6 +457,214 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected void onCancelled() {
             mAuthTask = null;
+            showProgress(false);
+        }
+    }
+
+    private void attemptSignup() {
+        if (mSignupTask != null) {
+            return;
+        }
+        // Reset errors.
+        firstNameView.setError(null);
+        lastNameView.setError(null);
+        addressView.setError(null);
+        cityView.setError(null);
+        stateView.setError(null);
+        zipView.setError(null);
+        phoneView.setError(null);
+        countryView.setError(null);
+        dobView.setError(null);
+
+        String firstName = firstNameView.getText().toString();
+        String lastName = lastNameView.getText().toString();
+        String address = addressView.getText().toString();
+        String city = cityView.getText().toString();
+        String state = stateView.getText().toString();
+        String zip = zipView.getText().toString();
+        String phone = phoneView.getText().toString();
+        String country = countryView.getText().toString();
+        String dob = dobView.getText().toString();
+
+        boolean cancel = false;
+        View focusView = null;
+
+
+        if (!ValidationUtils.checkValidity(firstName, AppConstants.DATA_TYPE_GENERAL_TEXT, this)) {
+            firstNameView.setError(getString(R.string.error_enter_all_details));
+            focusView = firstNameView;
+            cancel = true;
+        }
+
+        if (!ValidationUtils.checkValidity(lastName, AppConstants.DATA_TYPE_GENERAL_TEXT, this)) {
+            lastNameView.setError(getString(R.string.error_enter_all_details));
+            focusView = lastNameView;
+            cancel = true;
+        }
+
+        if (!ValidationUtils.checkValidity(address, AppConstants.DATA_TYPE_GENERAL_TEXT, this)) {
+            addressView.setError(getString(R.string.error_enter_all_details));
+            focusView = addressView;
+            cancel = true;
+        }
+
+        if (!ValidationUtils.checkValidity(city, AppConstants.DATA_TYPE_GENERAL_TEXT, this)) {
+            cityView.setError(getString(R.string.error_enter_all_details));
+            focusView = cityView;
+            cancel = true;
+        }
+
+        if (!ValidationUtils.checkValidity(state, AppConstants.DATA_TYPE_GENERAL_TEXT, this)) {
+            stateView.setError(getString(R.string.error_enter_all_details));
+            focusView = stateView;
+            cancel = true;
+        }
+
+        if (!ValidationUtils.checkValidity(zip, AppConstants.DATA_TYPE_GENERAL_TEXT, this)) {
+            zipView.setError(getString(R.string.error_enter_all_details));
+            focusView = zipView;
+            cancel = true;
+        }
+
+        if (!ValidationUtils.checkValidity(phone, AppConstants.DATA_TYPE_PHONE_NUMBER, this)) {
+            phoneView.setError(getString(R.string.error_enter_all_details));
+            focusView = lastNameView;
+            cancel = true;
+        }
+
+        if (!ValidationUtils.checkValidity(country, AppConstants.DATA_TYPE_GENERAL_TEXT, this)) {
+            countryView.setError(getString(R.string.error_enter_all_details));
+            focusView = countryView;
+            cancel = true;
+        }
+
+        //check with backend
+        if (!ValidationUtils.checkValidity(dob, AppConstants.DATA_TYPE_GENERAL_TEXT, this)) {
+            dobView.setError(getString(R.string.error_enter_all_details));
+            focusView = dobView;
+            cancel = true;
+        }
+
+        if (cancel) {
+            // There was an error; don't attempt login and focus the first
+            // form field with an error.
+            focusView.requestFocus();
+        } else {
+            // Show a progress spinner, and kick off a background task to
+            // perform the user login attempt.
+            showProgress(true);
+            mSignupTask = new UserSignupTask(firstName, lastName, address, city, state, zip, phone, country, dob);
+            mSignupTask.execute((Void) null);
+        }
+    }
+
+    public class UserSignupTask extends AsyncTask<Void, Void, Boolean> {
+
+        private final String firstName;
+        private final String lastName;
+        private final String address;
+        private final String city;
+        private final String state;
+        private final String zip;
+        private final String phone;
+        private final String country;
+        private final String dob;
+
+
+        UserSignupTask(String firstName, String lastName, String address, String city, String state,
+                       String zip, String phone, String country, String dob) {
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.address = address;
+            this.city = city;
+            this.state = state;
+            this.zip = zip;
+            this.phone = phone;
+            this.country = country;
+            this.dob = dob;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+            // TODO: attempt authentication against a network service.
+            isSuccess = false;
+            try {
+                // Simulate network access.
+                if (NetworkUtil.getConnectivityStatusString(LoginActivity.this)) {
+                    PBLApp.get().getPblApi().signup(userType, firstName, lastName, address, city, state, zip, phone, country,
+                            dob, new Response.Listener<User>() {
+                                @Override
+                                public void onResponse(User response) {
+                                    if (response != null) {
+                                        //if (response.getStatus().equals(AppConstants.SUCCESS)) {
+                                        isSuccess = true;
+                                        Log.e("success", "success");
+                                        MsgUtils.displayToast(LoginActivity.this, "Welcome" + " " + response.getFirstName());
+                                        saveData(response);
+                                        /*} else {
+                                            MsgUtils.displayToast(LoginActivity.this, response.getMessage());
+                                        }*/
+                                    }
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.e("Error", "response");
+                                    MsgUtils.displayToast(LoginActivity.this, R.string.error_generic);
+                                }
+                            });
+                } else {
+                    MsgUtils.displayToast(LoginActivity.this, getString(R.string.error_internet_unavailable));
+                }
+
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                return false;
+            }
+/*
+            for (String credential : DUMMY_CREDENTIALS) {
+                String[] pieces = credential.split(":");
+                if (pieces[0].equals(mEmail)) {
+                    // Account exists, return true if the password matches.
+                    return pieces[1].equals(mPassword);
+                }
+            }
+*/
+
+            // TODO: register the new account here.
+            return isSuccess;
+        }
+
+        private void saveData(User response) {
+            UserSessionUtils.saveUserLoginData(LoginActivity.this, response);
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mSignupTask = null;
+            showProgress(false);
+
+            if (success) {
+                if (PreferencesUtils.getBoolean(LoginActivity.this, AppConstants.IS_LOGGED_IN, false)) {
+                    if (userType.equals(AppConstants.USER_TYPE_DONOR)) {
+                        startActivity(new Intent(LoginActivity.this, DonorActivity.class));
+                        finish();
+                    } else {
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
+                    }
+                } else {
+                    MsgUtils.displayToast(LoginActivity.this, "There was an error while logging you in.");
+                }
+            } else {
+                MsgUtils.displayToast(LoginActivity.this, R.string.error_generic_2);
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mSignupTask = null;
             showProgress(false);
         }
     }
