@@ -3,9 +3,11 @@ package com.dbfall16.pblcloset.ui.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -18,7 +20,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.text.TextUtils;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,7 +35,17 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.android.volley.Response;
+import com.android.volley.error.VolleyError;
+import com.dbfall16.pblcloset.PBLApp;
 import com.dbfall16.pblcloset.R;
+import com.dbfall16.pblcloset.models.User;
+import com.dbfall16.pblcloset.utils.AppConstants;
+import com.dbfall16.pblcloset.utils.MsgUtils;
+import com.dbfall16.pblcloset.utils.NetworkUtil;
+import com.dbfall16.pblcloset.utils.PreferencesUtils;
+import com.dbfall16.pblcloset.utils.UserSessionUtils;
+import com.dbfall16.pblcloset.utils.ValidationUtils;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -47,13 +60,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private static final int REQUEST_READ_CONTACTS = 0;
 
     /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-    /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
@@ -63,11 +69,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    protected Toolbar mToolbar;
+
+    private boolean isSuccess;
+    private String userType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        userType = PreferencesUtils.getString(LoginActivity.this, AppConstants.USER_TYPE, "");
+
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar_login);
+        if (mToolbar != null) {
+            setSupportActionBar(mToolbar);
+            mToolbar.setTitleTextColor(ContextCompat.getColor(this, android.R.color.white));
+        }
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -94,6 +114,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mToolbar != null)
+            mToolbar.setTitle(PBLApp.get().getString(R.string.title_activity_sign_in));
     }
 
     private void populateAutoComplete() {
@@ -162,18 +189,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (!ValidationUtils.checkValidity(password, AppConstants.DATA_TYPE_PASSWORD, this)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)) {
+        if (!ValidationUtils.checkValidity(email, AppConstants.DATA_TYPE_EMAIL, this)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
@@ -190,16 +213,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
         }
-    }
-
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
     }
 
     /**
@@ -308,15 +321,43 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
 
+            // TODO: attempt authentication against a network service.
+            isSuccess = false;
             try {
                 // Simulate network access.
+                if (NetworkUtil.getConnectivityStatusString(LoginActivity.this)) {
+                    PBLApp.get().getPblApi().login(userType, mEmail,
+                            mPassword, new Response.Listener<User>() {
+                                @Override
+                                public void onResponse(User response) {
+                                    if (response != null) {
+                                        //if (response.getStatus().equals(AppConstants.SUCCESS)) {
+                                        isSuccess = true;
+                                        Log.e("success", "success");
+                                        MsgUtils.displayToast(LoginActivity.this, "Welcome" + " " + response.getFirstName());
+                                        saveData(response);
+                                        /*} else {
+                                            MsgUtils.displayToast(LoginActivity.this, response.getMessage());
+                                        }*/
+                                    }
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.e("Error", "response");
+                                    MsgUtils.displayToast(LoginActivity.this, R.string.error_generic);
+                                }
+                            });
+                } else {
+                    MsgUtils.displayToast(LoginActivity.this, getString(R.string.error_internet_unavailable));
+                }
+
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 return false;
             }
-
+/*
             for (String credential : DUMMY_CREDENTIALS) {
                 String[] pieces = credential.split(":");
                 if (pieces[0].equals(mEmail)) {
@@ -324,9 +365,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     return pieces[1].equals(mPassword);
                 }
             }
+*/
 
             // TODO: register the new account here.
-            return true;
+            return isSuccess;
+        }
+
+        private void saveData(User response) {
+            UserSessionUtils.saveUserLoginData(LoginActivity.this, response);
         }
 
         @Override
@@ -335,10 +381,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                finish();
+                //TODO : replace with the main activity when available.
+                if (PreferencesUtils.getBoolean(LoginActivity.this, AppConstants.IS_LOGGED_IN, false)) {
+                    if (userType.equals(AppConstants.USER_TYPE_DONOR)) {
+                        startActivity(new Intent(LoginActivity.this, DonorActivity.class));
+                        finish();
+                    } else {
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
+                    }
+                } else {
+                    MsgUtils.displayToast(LoginActivity.this, "There was an error while logging you in.");
+                }
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+                MsgUtils.displayToast(LoginActivity.this, R.string.error_generic_2);
             }
         }
 
@@ -348,5 +404,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
         }
     }
+
+
 }
 

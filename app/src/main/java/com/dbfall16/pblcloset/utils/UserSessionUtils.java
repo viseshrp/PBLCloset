@@ -2,18 +2,18 @@ package com.dbfall16.pblcloset.utils;
 
 import android.content.Context;
 
+import com.dbfall16.pblcloset.models.User;
+
 /**
  * Created by viseshprasad on 11/4/16.
  */
 
 public class UserSessionUtils {
-/*
-    public static void saveStudentLoginData(Context mContext, HealthOfficial response) {
+
+    public static void saveUserLoginData(Context mContext, User response) {
+        PreferencesUtils.setString(mContext, AppConstants.USER_ID, response.getUserId());
         PreferencesUtils.setString(mContext, AppConstants.EMAIL, response.getEmail());
-        PreferencesUtils.setString(mContext, AppConstants.USER_FIRST_NAME, response.getFirst_name());
-        PreferencesUtils.setString(mContext, AppConstants.USER_LAST_NAME, response.getLast_name());
-        PreferencesUtils.setString(mContext, AppConstants.MAPPED_COUNTY, response.getMappedCounty());
-        PreferencesUtils.setString(mContext, AppConstants.MAPPED_DISEASE, response.getMappedDisease());
+        PreferencesUtils.setString(mContext, AppConstants.USER_FIRST_NAME, response.getFirstName());
+        PreferencesUtils.setString(mContext, AppConstants.USER_LAST_NAME, response.getSecondName());
     }
-*/
 }
