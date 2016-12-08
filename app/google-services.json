@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "807892304366",
+    "firebase_url": "https://pblcloset.firebaseio.com",
+    "project_id": "pblcloset",
+    "storage_bucket": "pblcloset.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:807892304366:android:89dbe946e9fe7115",
+        "android_client_info": {
+          "package_name": "com.dbfall16.pblcloset"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "807892304366-qi5h8ofrrmok9poalquobjo11kj3kgce.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dbfall16.pblcloset",
+            "certificate_hash": "FE45E0B8D07386C26A7EDB3EC7646EA94A896166"
+          }
+        },
+        {
+          "client_id": "807892304366-rrgo5j6g9uljm2phq6ab466pvcnpp5mj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGfMzobdiNyD1J7AOmreTEAVCHjEomAIc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "807892304366-rrgo5j6g9uljm2phq6ab466pvcnpp5mj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
