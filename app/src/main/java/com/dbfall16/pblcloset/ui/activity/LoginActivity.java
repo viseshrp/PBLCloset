@@ -31,6 +31,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ import com.dbfall16.pblcloset.utils.UserSessionUtils;
 import com.dbfall16.pblcloset.utils.ValidationUtils;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -80,7 +82,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private String userType;
 
     @BindView(R.id.login_form)
-    LinearLayout loginForm;
+    ScrollView loginForm;
 
     @BindView(R.id.signup_form)
     LinearLayout signupForm;
@@ -122,6 +124,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        ButterKnife.bind(this);
 
         userType = PreferencesUtils.getString(LoginActivity.this, AppConstants.USER_TYPE, "");
 
@@ -171,7 +175,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     void onSignUpDoneClicked() {
         attemptSignup();
     }
-
 
     @Override
     protected void onResume() {
@@ -414,15 +417,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             } catch (InterruptedException e) {
                 return false;
             }
-/*
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-*/
 
             // TODO: register the new account here.
             return isSuccess;

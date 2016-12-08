@@ -33,5 +33,8 @@ public class AppConstants {
     public static final String USER_TYPE_DONOR = "1";
     public static final String USER_TYPE_UNREG = "2";
 
+    public static final String PROCESSED = "Processed";
+    public static final String PENDING = "Pending";
+
 
 }

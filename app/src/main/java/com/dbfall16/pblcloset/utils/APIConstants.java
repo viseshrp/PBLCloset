@@ -15,5 +15,5 @@ public class APIConstants {
 
     public static String SIGNUP = BASE_URL + "/pbl/signup/";
 
-    public static String GET_POSTED_ITEMS_URL = BASE_URL + "/pbl/allPostedItems/";
+    public static String GET_DONATED_LIST_URL = BASE_URL + "/PBLCloset/donatedItem/";
 }
