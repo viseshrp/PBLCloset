@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PBLCloset</string>
+    <string name="app_name">PBL Closet</string>
     <string name="title_activity_login">Sign in</string>
 
     <!-- Strings related to login -->
@@ -55,5 +55,18 @@
     <string name="prompt_phone">Phone</string>
     <string name="prompt_country">Country</string>
     <string name="prompt_dob">Date of Birth</string>
+
+
+    <string name="heading_description">Description</string>
+    <string name="heading_date">Received Date</string>
+    <string name="heading_status">Status</string>
+
+    <string name="prompt_title">Item name</string>
+    <string name="prompt_description">Description</string>
+    <string name="prompt_size">Size</string>
+    <string name="prompt_image">Add Image</string>
+    <string name="prompt_donate">Donate</string>
+
+    <string name="activity_add_item">Add item</string>
 
 </resources>
