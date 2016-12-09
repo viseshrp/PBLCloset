@@ -10,7 +10,19 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.dbfall16.pblcloset.ui.activity.DonateItemActivity">
 
+    <!-- Login progress -->
+    <ProgressBar
+        android:id="@+id/donate_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+
     <ScrollView
+        android:id="@+id/donate_form_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingLeft="@dimen/activity_horizontal_margin"

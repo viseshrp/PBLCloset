@@ -113,17 +113,12 @@ public class DonorActivity extends AppCompatActivity {
         mDonorItemList.setHasFixedSize(true);
         RecyclerView.LayoutManager mLayoutManger = new LinearLayoutManager(this);
         mDonorItemList.setLayoutManager(mLayoutManger);
-/*        donorItemsAdapter = new DonorItemsAdapter(this, new DonorItemsAdapter.ItemTapListener() {
+        donorItemsAdapter = new DonorItemsAdapter(this, new DonorItemsAdapter.ItemTapListener() {
             @Override
             public void onTap(Item item) {
 
-                    Intent intent = new Intent(this, InfoActivity.class);
-                    intent.putExtra(AppConstants.SELECTED_DISEASE_ID, diseaseName.getDiseaseId());
-                    startActivity(intent);
-
             }
         });
-        */
 
         mDonorItemList.setAdapter(donorItemsAdapter);
     }
@@ -224,7 +219,7 @@ public class DonorActivity extends AppCompatActivity {
             isSuccess = false;
             try {
                 if (NetworkUtil.getConnectivityStatusString(context)) {
-                    enableNoInternetView(false);
+                    //enableNoInternetView(false);
                     PBLApp.get().getPblApi().getDonatedList(userId, new Response.Listener<ItemList>() {
                         @Override
                         public void onResponse(ItemList response) {
@@ -233,8 +228,8 @@ public class DonorActivity extends AppCompatActivity {
                                 isSuccess = true;
                                 setDataset(response.getItemList());
                             } else {
-                                showProgress(false);
-                                showEmptyList(true);
+                                //showProgress(false);
+                                //showEmptyList(true);
                                 isSuccess = false;
                             }
                         }
@@ -245,8 +240,8 @@ public class DonorActivity extends AppCompatActivity {
                                 downloadDonatedList();
                                 numberOfRetries += 1;
                             } else {
-                                showProgress(false);
-                                showEmptyList(true);
+                                //showProgress(false);
+                                //showEmptyList(true);
                                 MsgUtils.displayToast(context, R.string.error_generic);
                                 isSuccess = false;
                             }
@@ -254,8 +249,8 @@ public class DonorActivity extends AppCompatActivity {
                     });
                 } else {
                     isSuccess = false;
-                    showProgress(false);
-                    enableNoInternetView(true);
+                    //showProgress(false);
+                    //enableNoInternetView(true);
                     MsgUtils.displayToast(context, R.string.error_internet_unavailable);
                 }
 

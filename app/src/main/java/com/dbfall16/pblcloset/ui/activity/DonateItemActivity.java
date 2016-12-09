@@ -1,6 +1,9 @@
 package com.dbfall16.pblcloset.ui.activity;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -22,6 +26,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 
 import com.android.volley.Response;
 import com.android.volley.error.VolleyError;
@@ -50,6 +55,9 @@ import butterknife.OnClick;
 
 public class DonateItemActivity extends AppCompatActivity {
 
+    @BindView(R.id.donate_form_main)
+    ScrollView donateMain;
+
     @BindView(R.id.add_image)
     Button addImageButton;
 
@@ -74,6 +82,8 @@ public class DonateItemActivity extends AppCompatActivity {
     @BindView(R.id.image_cam)
     ImageView imageView;
 
+    private View mProgressView;
+
     private DonateItemTask mDonateItemTask = null;
 
     private boolean isSuccess;
@@ -82,8 +92,6 @@ public class DonateItemActivity extends AppCompatActivity {
     private static final int REQUEST_CAMERA = 0;
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private Point mSize;
-
-    private ProgressDialog progressDialog;
 
     private Uri photoUri;
 
@@ -108,42 +116,8 @@ public class DonateItemActivity extends AppCompatActivity {
 
         userId = PreferencesUtils.getString(this, AppConstants.USER_ID, "");
 
-    }
+        mProgressView = findViewById(R.id.donate_progress);
 
-    public void showProgressDialog(String message) {
-        String msg;
-        if (message == null) {
-            msg = getString(R.string.progress_dialog_loading_text);
-        } else {
-            msg = message;
-        }
-
-        progressDialog = ProgressDialog.show(this, null, msg, true);
-    }
-
-    public void showProgressDialog(String message, boolean dismissable) {
-        String msg;
-        if (message == null) {
-            msg = getString(R.string.progress_dialog_loading_text);
-        } else {
-            msg = message;
-        }
-
-        progressDialog = ProgressDialog.show(this, null, msg, true, dismissable, null);
-    }
-
-    public void updateProgressMessage(String message) {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.setMessage(message);
-        }
-    }
-
-    public void dismissProgressDialog() {
-        if (this.isFinishing()) return;
-
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
     }
 
     @Override
@@ -152,14 +126,32 @@ public class DonateItemActivity extends AppCompatActivity {
 
         if (requestCode == REQUEST_CAMERA) {
             photoUri = data.getData();
-            // Get the bitmap in according to the width of the device
-            Bitmap bitmap = ImageUtility.decodeSampledBitmapFromPath(photoUri.getPath(), mSize.x, mSize.x);
-            ((ImageView) findViewById(R.id.image)).setImageBitmap(bitmap);
+
+            storageReference = storage.getReference();
+            StorageReference storageReference1 = storageReference.child("Chat/Images/" + System.currentTimeMillis() + Math.random() * 1000 + ".png");
+
+            if (photoUri != null) {
+                UploadTask uploadTask = storageReference1.putFile(photoUri);
+                showProgress(true);
+                uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        showProgress(false);
+                        Uri imageURI = taskSnapshot.getDownloadUrl();
+                        if (imageURI != null)
+                            photoUrl = imageURI.toString();
+                    }
+                });
+
+                // Get the bitmap in according to the width of the device
+                Bitmap bitmap = ImageUtility.decodeSampledBitmapFromPath(photoUri.getPath(), mSize.x, mSize.x);
+                ((ImageView) findViewById(R.id.image_cam)).setImageBitmap(bitmap);
+            }
+            super.onActivityResult(requestCode, resultCode, data);
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @OnClick(R.id.image)
+    @OnClick(R.id.image_cam)
     public void requestForCameraPermission(View view) {
         final String permission = Manifest.permission.CAMERA;
         if (ContextCompat.checkSelfPermission(DonateItemActivity.this, permission)
@@ -224,6 +216,42 @@ public class DonateItemActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            donateMain.setVisibility(show ? View.GONE : View.VISIBLE);
+            donateMain.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    donateMain.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            donateMain.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
+    }
+
     @OnClick(R.id.donate)
     void onDonateClicked() {
         donateItem();
@@ -282,31 +310,14 @@ public class DonateItemActivity extends AppCompatActivity {
             cancel = true;
         }
 
-        //firebase call
-        //Uploading Image
-        storageReference = storage.getReference();
-        StorageReference storageReference1 = storageReference.child("Chat/Images/" + description + String.valueOf(new Date()) + ".png");
-
-        if (photoUri != null) {
-            UploadTask uploadTask = storageReference1.putFile(photoUri);
-            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Uri imageURI = taskSnapshot.getDownloadUrl();
-
-                    if (imageURI != null)
-                        photoUrl = imageURI.toString();
-                }
-            });
-        } else {
+        if (photoUrl == null) {
             cancel = true;
             focusView = imageView;
         }
 
+        Log.e("photourl",photoUrl + "///");
 
-        if (cancel)
-
-        {
+        if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
@@ -316,6 +327,7 @@ public class DonateItemActivity extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             //showProgressDialog("Loading...");
+            showProgress(true);
             mDonateItemTask = new DonateItemTask(description, color, itemType, size, brand, photoUrl);
             mDonateItemTask.execute((Void) null);
         }
@@ -347,19 +359,16 @@ public class DonateItemActivity extends AppCompatActivity {
             try {
                 // Simulate network access.
                 if (NetworkUtil.getConnectivityStatusString(DonateItemActivity.this)) {
-                    showProgressDialog("Loading...");
                     PBLApp.get().getPblApi().donate(userId, description, color, itemType, size, brand, picture_url, new Response.Listener<Item>() {
                         @Override
                         public void onResponse(Item response) {
                             if (response != null) {
-                                dismissProgressDialog();
                                 isSuccess = true;
                             }
                         }
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            dismissProgressDialog();
                             MsgUtils.displayToast(DonateItemActivity.this, R.string.error_generic);
                         }
                     });
@@ -380,7 +389,7 @@ public class DonateItemActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             mDonateItemTask = null;
-            dismissProgressDialog();
+            showProgress(false);
 
             if (success) {
                 finish();
@@ -392,7 +401,7 @@ public class DonateItemActivity extends AppCompatActivity {
         @Override
         protected void onCancelled() {
             mDonateItemTask = null;
-            dismissProgressDialog();
+            showProgress(false);
         }
     }
 

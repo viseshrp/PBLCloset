@@ -51,6 +51,7 @@
         <activity android:name=".ui.activity.MainActivity" />
         <activity
             android:name=".ui.activity.DonorActivity"
+            android:exported="true"
             android:label="@string/title_activity_donor"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
