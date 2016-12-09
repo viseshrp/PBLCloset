@@ -76,8 +76,6 @@ public class DonateItemActivity extends AppCompatActivity {
 
     private DonateItemTask mDonateItemTask = null;
 
-    protected Toolbar mToolbar;
-
     private boolean isSuccess;
     private String userId;
 
@@ -107,11 +105,6 @@ public class DonateItemActivity extends AppCompatActivity {
         mSize = new Point();
         display.getSize(mSize);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar_login);
-        if (mToolbar != null) {
-            setSupportActionBar(mToolbar);
-            mToolbar.setTitleTextColor(ContextCompat.getColor(this, android.R.color.white));
-        }
 
         userId = PreferencesUtils.getString(this, AppConstants.USER_ID, "");
 
@@ -229,8 +222,6 @@ public class DonateItemActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mToolbar != null)
-            mToolbar.setTitle(PBLApp.get().getString(R.string.activity_add_item));
     }
 
     @OnClick(R.id.donate)
