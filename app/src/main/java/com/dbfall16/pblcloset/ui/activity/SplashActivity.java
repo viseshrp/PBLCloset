@@ -17,7 +17,7 @@ public class SplashActivity extends AwesomeSplash {
     @Override
     public void initSplash(ConfigSplash configSplash) {
         //Customize Circular Reveal
-        configSplash.setBackgroundColor(R.color.colorPrimary); //any color you want form colors.xml
+        configSplash.setBackgroundColor(R.color.colorPrimary); //any colorView you want form colors.xml
         configSplash.setAnimCircularRevealDuration(2000); //int ms
         configSplash.setRevealFlagX(Flags.REVEAL_RIGHT);  //or Flags.REVEAL_LEFT
         configSplash.setRevealFlagY(Flags.REVEAL_BOTTOM); //or Flags.REVEAL_TOP
@@ -25,7 +25,7 @@ public class SplashActivity extends AwesomeSplash {
         //Choose LOGO OR PATH; if you don't provide String value for path it's logo by default
 
         //Customize Logo
-        configSplash.setLogoSplash(R.mipmap.ic_launcher); //or any other drawable
+        configSplash.setLogoSplash(R.drawable.pblfinal); //or any other drawable
         configSplash.setAnimLogoSplashDuration(2000); //int ms
         configSplash.setAnimLogoSplashTechnique(Techniques.Bounce); //choose one form Techniques (ref: https://github.com/daimajia/AndroidViewAnimations)
 
@@ -36,9 +36,9 @@ public class SplashActivity extends AwesomeSplash {
         configSplash.setOriginalWidth(400); //in relation to your svg (path) resource
         configSplash.setAnimPathStrokeDrawingDuration(3000);
         configSplash.setPathSplashStrokeSize(3); //I advise value be <5
-        configSplash.setPathSplashStrokeColor(R.color.colorAccent); //any color you want form colors.xml
+        configSplash.setPathSplashStrokeColor(R.color.colorAccent); //any colorView you want form colors.xml
         configSplash.setAnimPathFillingDuration(3000);
-        configSplash.setPathSplashFillColor(R.color.materialRed); //path object filling color
+        configSplash.setPathSplashFillColor(R.color.materialRed); //path object filling colorView
 
 
         //TODO : Alternative if animationsFinished doesnt do the login check.
@@ -52,7 +52,7 @@ public class SplashActivity extends AwesomeSplash {
 
         //Customize Title
         configSplash.setTitleSplash(PBLApp.get().getString(R.string.app_name));
-        configSplash.setTitleTextColor(R.color.colorAccent);
+        configSplash.setTitleTextColor(R.color.textColorPrimary);
         configSplash.setTitleTextSize(30f); //float value
         configSplash.setAnimTitleDuration(3000);
         configSplash.setAnimTitleTechnique(Techniques.FadeInDown);
