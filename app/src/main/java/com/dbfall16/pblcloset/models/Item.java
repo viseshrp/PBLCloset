@@ -2,6 +2,8 @@ package com.dbfall16.pblcloset.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 /**
  * Created by viseshprasad on 12/1/16.
  */
@@ -10,14 +12,8 @@ public class Item extends BaseModel {
     @SerializedName("itemId")
     private String itemId;
 
-    @SerializedName("catId")
-    private String catId;
-
-    @SerializedName("categGender")
-    private String categGender;
-
-    @SerializedName("categDescription")
-    private String categDescription;
+    @SerializedName("categories")
+    private ArrayList<Category> categories;
 
     @SerializedName("description")
     private String description;
@@ -52,6 +48,14 @@ public class Item extends BaseModel {
 
     public void setItemId(String itemId) {
         this.itemId = itemId;
+    }
+
+    public ArrayList<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(ArrayList<Category> categories) {
+        this.categories = categories;
     }
 
     public String getDescription() {
@@ -94,6 +98,14 @@ public class Item extends BaseModel {
         this.brand = brand;
     }
 
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+
     public String getDateReceived() {
         return dateReceived;
     }
@@ -108,14 +120,6 @@ public class Item extends BaseModel {
 
     public void setDonorId(String donorId) {
         this.donorId = donorId;
-    }
-
-    public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
     }
 
     public boolean isProcessed() {

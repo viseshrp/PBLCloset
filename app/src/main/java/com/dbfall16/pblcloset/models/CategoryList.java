@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 
 public class CategoryList extends BaseModel {
-    @SerializedName("categoryList")
+    @SerializedName("categories")
     ArrayList<Category> categoryList;
 
     public ArrayList<Category> getCategoryList() {

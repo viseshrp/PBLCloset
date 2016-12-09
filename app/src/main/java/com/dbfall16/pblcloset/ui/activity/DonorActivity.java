@@ -1,72 +1,91 @@
 package com.dbfall16.pblcloset.ui.activity;
 
-import android.support.design.widget.TabLayout;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 
+import com.android.volley.Response;
+import com.android.volley.error.VolleyError;
+import com.dbfall16.pblcloset.PBLApp;
 import com.dbfall16.pblcloset.R;
+import com.dbfall16.pblcloset.adapters.DonorItemsAdapter;
+import com.dbfall16.pblcloset.models.Item;
+import com.dbfall16.pblcloset.models.ItemList;
+import com.dbfall16.pblcloset.ui.views.MyRecyclerView;
+import com.dbfall16.pblcloset.utils.AppConstants;
+import com.dbfall16.pblcloset.utils.MsgUtils;
+import com.dbfall16.pblcloset.utils.NetworkUtil;
+import com.dbfall16.pblcloset.utils.PreferencesUtils;
+
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class DonorActivity extends AppCompatActivity {
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
+    @BindView(R.id.donor_item_list)
+    MyRecyclerView mDonorItemList;
+
+    @BindView(R.id.emptyListLayout)
+    RelativeLayout mEmptyListLayout;
+
+    @BindView(R.id.no_internet_layout)
+    RelativeLayout mNoInternetLayout;
+
+    @BindView(R.id.download_progress)
+    View mProgressView;
+
+    private DownloadDonatedList downloadDonatedList = null;
+
+    private boolean isSuccess;
+    private int numberOfRetries = -1;
+
+    private DonorItemsAdapter donorItemsAdapter;
+
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_donor);
 
+        ButterKnife.bind(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                startActivity(new Intent(DonorActivity.this, DonateItemActivity.class));
             }
         });
 
-    }
+        userId = PreferencesUtils.getString(this, AppConstants.USER_ID, "");
 
+        setupListView();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -82,83 +101,192 @@ public class DonorActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_refresh) {
+            downloadDonatedList();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+    private void setupListView() {
 
-        public PlaceholderFragment() {
+        mDonorItemList.setHasFixedSize(true);
+        RecyclerView.LayoutManager mLayoutManger = new LinearLayoutManager(this);
+        mDonorItemList.setLayoutManager(mLayoutManger);
+/*        donorItemsAdapter = new DonorItemsAdapter(this, new DonorItemsAdapter.ItemTapListener() {
+            @Override
+            public void onTap(Item item) {
+
+                    Intent intent = new Intent(this, InfoActivity.class);
+                    intent.putExtra(AppConstants.SELECTED_DISEASE_ID, diseaseName.getDiseaseId());
+                    startActivity(intent);
+
+            }
+        });
+        */
+
+        mDonorItemList.setAdapter(donorItemsAdapter);
+    }
+
+    private void downloadDonatedList() {
+        if (downloadDonatedList != null) {
+            return;
         }
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
+        showProgress(true);
+        downloadDonatedList = new DownloadDonatedList(this, userId);
+        downloadDonatedList.execute((Void) null);
+    }
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_donor, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mDonorItemList.setVisibility(show ? View.GONE : View.VISIBLE);
+            mDonorItemList.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mDonorItemList.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mDonorItemList.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
-        }
-
-        @Override
-        public int getCount() {
-            // Show 3 total pages.
-            return 3;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "SECTION 1";
-                case 1:
-                    return "SECTION 2";
-                case 2:
-                    return "SECTION 3";
+    private void showEmptyList(boolean value) {
+        if (mEmptyListLayout != null && mDonorItemList != null) {
+            if (value) {
+                //Show empty list layout
+                mEmptyListLayout.setVisibility(View.VISIBLE);
+                mDonorItemList.setVisibility(View.GONE);
+            } else {
+                //Show list view;
+                mEmptyListLayout.setVisibility(View.GONE);
+                mDonorItemList.setVisibility(View.VISIBLE);
             }
-            return null;
+        }
+    }
+
+    private void enableNoInternetView(boolean value) {
+        if (mNoInternetLayout != null && mDonorItemList != null) {
+            if (value) {
+                mNoInternetLayout.setVisibility(View.VISIBLE);
+                mDonorItemList.setVisibility(View.GONE);
+            } else {
+                mNoInternetLayout.setVisibility(View.GONE);
+                mDonorItemList.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    public void onResume() {
+        super.onResume();
+        downloadDonatedList();
+    }
+
+    public class DownloadDonatedList extends AsyncTask<Void, Void, Boolean> {
+
+        private final String userId;
+        private Context context;
+
+        DownloadDonatedList(Context context, String userId) {
+            this.context = context;
+            this.userId = userId;
+        }
+
+        private void setDataset(ArrayList<Item> itemArrayList) {
+            donorItemsAdapter.setDataset(itemArrayList);
+            donorItemsAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+            isSuccess = false;
+            try {
+                if (NetworkUtil.getConnectivityStatusString(context)) {
+                    enableNoInternetView(false);
+                    PBLApp.get().getPblApi().getDonatedList(userId, new Response.Listener<ItemList>() {
+                        @Override
+                        public void onResponse(ItemList response) {
+                            showProgress(false);
+                            if (response != null && response.getItemList() != null && !response.getItemList().isEmpty()) {
+                                isSuccess = true;
+                                setDataset(response.getItemList());
+                            } else {
+                                showProgress(false);
+                                showEmptyList(true);
+                                isSuccess = false;
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            if (numberOfRetries < 4) {
+                                downloadDonatedList();
+                                numberOfRetries += 1;
+                            } else {
+                                showProgress(false);
+                                showEmptyList(true);
+                                MsgUtils.displayToast(context, R.string.error_generic);
+                                isSuccess = false;
+                            }
+                        }
+                    });
+                } else {
+                    isSuccess = false;
+                    showProgress(false);
+                    enableNoInternetView(true);
+                    MsgUtils.displayToast(context, R.string.error_internet_unavailable);
+                }
+
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                return false;
+            }
+            return isSuccess;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            downloadDonatedList = null;
+            showProgress(false);
+
+            if (!success) {
+                if (numberOfRetries < 4) {
+                    downloadDonatedList();
+                    numberOfRetries += 1;
+                } else {
+                    showEmptyList(true);
+                    MsgUtils.displayToast(context, R.string.error_generic);
+                }
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            downloadDonatedList = null;
+            numberOfRetries = -1;
+            showProgress(false);
         }
     }
 }

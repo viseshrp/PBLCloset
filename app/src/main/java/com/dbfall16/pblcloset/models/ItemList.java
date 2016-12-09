@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 
 public class ItemList extends BaseModel {
-    @SerializedName("itemList")
+    @SerializedName("response")
     ArrayList<Item> itemList;
 
     public ArrayList<Item> getItemList() {

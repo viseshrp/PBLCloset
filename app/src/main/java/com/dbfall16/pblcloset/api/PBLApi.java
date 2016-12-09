@@ -3,6 +3,8 @@ package com.dbfall16.pblcloset.api;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.dbfall16.pblcloset.models.Item;
+import com.dbfall16.pblcloset.models.ItemList;
 import com.dbfall16.pblcloset.models.User;
 
 /**
@@ -23,9 +25,21 @@ public class PBLApi {
     }
 
     public Request<?> signup(String userType, String firstName, String lastName, String address, String city, String state,
-                            String zip, String phone, String country, String dob, Response.Listener<User> listener,
-                            Response.ErrorListener errorListener) {
+                             String zip, String phone, String country, String dob, Response.Listener<User> listener,
+                             Response.ErrorListener errorListener) {
         return mRequestQueue.add(new SignupAPI(userType, firstName, lastName, address, city, state, zip, phone, country, dob, listener, errorListener));
     }
+
+    public Request<?> getDonatedList(String userId, Response.Listener<ItemList> listener,
+                                     Response.ErrorListener errorListener) {
+        return mRequestQueue.add(new DonatedListApi(userId, listener, errorListener));
+    }
+
+    public Request<?> donate(String userId, String description, String color, String itemType, String size,
+                             String brand, String picture, Response.Listener<Item> listener,
+                             Response.ErrorListener errorListener) {
+        return mRequestQueue.add(new DonateItemApi(userId, description, color, itemType, size, brand, picture, listener, errorListener));
+    }
+
 
 }
