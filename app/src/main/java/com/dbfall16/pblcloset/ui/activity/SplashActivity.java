@@ -65,7 +65,10 @@ public class SplashActivity extends AwesomeSplash {
         //// TODO: 11/21/16 check default values later.
         Intent intent = null;
         if (PreferencesUtils.getBoolean(SplashActivity.this, AppConstants.IS_LOGGED_IN, false)) {
-            //intent = new Intent(SplashActivity.this, MainActivity.class); //// TODO: 12/1/16
+            if (PreferencesUtils.getString(SplashActivity.this, AppConstants.USER_TYPE, "").equals(AppConstants.USER_TYPE_BUYER))
+                intent = new Intent(SplashActivity.this, MainActivity.class);
+            else
+                intent = new Intent(SplashActivity.this, DonorActivity.class);
         } else {
             intent = new Intent(SplashActivity.this, PBLAppIntro.class);
         }

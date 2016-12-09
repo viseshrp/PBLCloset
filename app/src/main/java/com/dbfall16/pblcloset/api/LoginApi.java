@@ -17,13 +17,12 @@ import java.nio.charset.Charset;
 
 public class LoginApi extends AppRequest<User> {
 
-    public LoginApi(String userType, String userName, String password, Response.Listener<User> listener, Response.ErrorListener errorListener) {
+    public LoginApi(String userName, String password, Response.Listener<User> listener, Response.ErrorListener errorListener) {
         super(Method.POST, APIConstants.LOGIN, listener, errorListener);
         setShouldCache(false);
         setPriority(Request.Priority.IMMEDIATE);
 
-        setHttpParams("userType", userType);
-        setHttpParams("userName", userName);
+        setHttpParams("email", userName);
         setHttpParams("password", password);
     }
 

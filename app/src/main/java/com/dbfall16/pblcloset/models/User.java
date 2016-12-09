@@ -41,6 +41,12 @@ public class User extends BaseModel {
     @SerializedName("dob")
     private String dob;
 
+    @SerializedName("userType")
+    private String userType;
+
+    @SerializedName("subscription")
+    private boolean subscription;
+
     public String getUserId() {
         return userId;
     }
@@ -127,5 +133,21 @@ public class User extends BaseModel {
 
     public void setDob(String dob) {
         this.dob = dob;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
+    public boolean isSubscription() {
+        return subscription;
+    }
+
+    public void setSubscription(boolean subscription) {
+        this.subscription = subscription;
     }
 }

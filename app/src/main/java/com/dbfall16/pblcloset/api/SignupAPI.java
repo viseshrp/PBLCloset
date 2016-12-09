@@ -18,7 +18,7 @@ import java.nio.charset.Charset;
 public class SignupAPI extends AppRequest<User> {
 
     public SignupAPI(String userType, String firstName, String lastName, String address, String city, String state,
-                     String zip, String phone, String country, String dob,
+                     String zip, String phone, String country, String dob, String email, String password, boolean subscription,
                      Response.Listener<User> listener, Response.ErrorListener errorListener) {
         super(Method.POST, APIConstants.SIGNUP, listener, errorListener);
         setShouldCache(false);
@@ -26,7 +26,7 @@ public class SignupAPI extends AppRequest<User> {
 
         setHttpParams("userType", userType);
         setHttpParams("firstName", firstName);
-        setHttpParams("lastName", lastName);
+        setHttpParams("secondName", lastName);
         setHttpParams("address", address);
         setHttpParams("city", city);
         setHttpParams("state", state);
@@ -34,6 +34,10 @@ public class SignupAPI extends AppRequest<User> {
         setHttpParams("phone", phone);
         setHttpParams("country", country);
         setHttpParams("dob", dob);
+        setHttpParams("email", email);
+        setHttpParams("password", password);
+
+        setHttpParams("subscription", String.valueOf(subscription));
     }
 
     @Override

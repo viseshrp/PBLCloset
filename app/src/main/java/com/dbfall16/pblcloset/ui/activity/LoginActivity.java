@@ -29,6 +29,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -41,6 +42,7 @@ import com.android.volley.Response;
 import com.android.volley.error.VolleyError;
 import com.dbfall16.pblcloset.PBLApp;
 import com.dbfall16.pblcloset.R;
+import com.dbfall16.pblcloset.models.PblResponse;
 import com.dbfall16.pblcloset.models.User;
 import com.dbfall16.pblcloset.utils.AppConstants;
 import com.dbfall16.pblcloset.utils.MsgUtils;
@@ -74,6 +76,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
+
+    private AutoCompleteTextView mEmailSignupView;
+    private EditText mPasswordSignupView;
+
     private View mProgressView;
     private View mLoginFormView;
     protected Toolbar mToolbar;
@@ -120,6 +126,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @BindView(R.id.dob)
     EditText dobView;
 
+    @BindView(R.id.checkbox_one)
+    CheckBox sub;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +139,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         userType = PreferencesUtils.getString(LoginActivity.this, AppConstants.USER_TYPE, "");
 
+        if (userType.equals(AppConstants.USER_TYPE_BUYER))
+            sub.setVisibility(View.VISIBLE);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar_login);
         if (mToolbar != null) {
@@ -139,6 +151,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
+
+        // Set up the login form.
+        mEmailSignupView = (AutoCompleteTextView) findViewById(R.id.email_signup);
+        populateAutoComplete();
+
+        mPasswordSignupView = (EditText) findViewById(R.id.password_signup);
+
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -387,7 +406,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             try {
                 // Simulate network access.
                 if (NetworkUtil.getConnectivityStatusString(LoginActivity.this)) {
-                    PBLApp.get().getPblApi().login(userType, mEmail,
+                    PBLApp.get().getPblApi().login(mEmail,
                             mPassword, new Response.Listener<User>() {
                                 @Override
                                 public void onResponse(User response) {
@@ -459,6 +478,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         if (mSignupTask != null) {
             return;
         }
+
+        // Reset errors.
+        mEmailSignupView.setError(null);
+        mPasswordSignupView.setError(null);
+
         // Reset errors.
         firstNameView.setError(null);
         lastNameView.setError(null);
@@ -470,6 +494,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         countryView.setError(null);
         dobView.setError(null);
 
+        // Store values at the time of the login attempt.
+        String email = mEmailSignupView.getText().toString();
+        String password = mPasswordSignupView.getText().toString();
+
         String firstName = firstNameView.getText().toString();
         String lastName = lastNameView.getText().toString();
         String address = addressView.getText().toString();
@@ -480,8 +508,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         String country = countryView.getText().toString();
         String dob = dobView.getText().toString();
 
+        boolean subValue = false;
+        subValue = sub.isChecked();
+
         boolean cancel = false;
         View focusView = null;
+
+        // Check for a valid password, if the user entered one.
+        if (!ValidationUtils.checkValidity(password, AppConstants.DATA_TYPE_PASSWORD, this)) {
+            mPasswordSignupView.setError(getString(R.string.error_invalid_password));
+            focusView = mPasswordSignupView;
+            cancel = true;
+        }
+
+        // Check for a valid email address.
+        if (!ValidationUtils.checkValidity(email, AppConstants.DATA_TYPE_EMAIL, this)) {
+            mEmailSignupView.setError(getString(R.string.error_invalid_email));
+            focusView = mEmailSignupView;
+            cancel = true;
+        }
 
 
         if (!ValidationUtils.checkValidity(firstName, AppConstants.DATA_TYPE_GENERAL_TEXT, this)) {
@@ -547,7 +592,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mSignupTask = new UserSignupTask(firstName, lastName, address, city, state, zip, phone, country, dob);
+            mSignupTask = new UserSignupTask(firstName, lastName, address, city, state, zip, phone, country, dob, email, password, subValue);
             mSignupTask.execute((Void) null);
         }
     }
@@ -563,10 +608,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         private final String phone;
         private final String country;
         private final String dob;
+        private final String email;
+        private final String password;
+        private final boolean sub;
 
 
         UserSignupTask(String firstName, String lastName, String address, String city, String state,
-                       String zip, String phone, String country, String dob) {
+                       String zip, String phone, String country, String dob, String email, String password, boolean sub) {
             this.firstName = firstName;
             this.lastName = lastName;
             this.address = address;
@@ -576,6 +624,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             this.phone = phone;
             this.country = country;
             this.dob = dob;
+            this.sub = sub;
+            this.email = email;
+            this.password = password;
         }
 
         @Override
@@ -587,15 +638,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 // Simulate network access.
                 if (NetworkUtil.getConnectivityStatusString(LoginActivity.this)) {
                     PBLApp.get().getPblApi().signup(userType, firstName, lastName, address, city, state, zip, phone, country,
-                            dob, new Response.Listener<User>() {
+                            dob, email, password, sub, new Response.Listener<PblResponse>() {
                                 @Override
-                                public void onResponse(User response) {
+                                public void onResponse(PblResponse response) {
                                     if (response != null) {
                                         //if (response.getStatus().equals(AppConstants.SUCCESS)) {
                                         isSuccess = true;
                                         Log.e("success", "success");
-                                        MsgUtils.displayToast(LoginActivity.this, "Welcome" + " " + response.getFirstName());
-                                        saveData(response);
+                                        User user = (User) response.getResponse();
+                                        MsgUtils.displayToast(LoginActivity.this, "Welcome" + " " + user.getFirstName());
+                                        saveData(user);
                                         /*} else {
                                             MsgUtils.displayToast(LoginActivity.this, response.getMessage());
                                         }*/

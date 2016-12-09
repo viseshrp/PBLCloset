@@ -213,7 +213,6 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/prompt_phone"
                         android:inputType="phone"
-                        android:maxLength="5"
                         android:maxLines="1"
                         android:singleLine="true" />
 
@@ -229,7 +228,6 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/prompt_country"
                         android:inputType="text"
-                        android:maxLength="2"
                         android:maxLines="1"
                         android:singleLine="true" />
 
@@ -245,11 +243,49 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/prompt_dob"
                         android:inputType="text"
-                        android:maxLength="2"
                         android:maxLines="1"
                         android:singleLine="true" />
 
                 </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/email_signup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/prompt_email"
+                        android:inputType="textEmailAddress"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/password_signup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/prompt_password"
+                        android:imeActionId="@+id/login"
+                        android:imeActionLabel="@string/action_sign_in_short"
+                        android:imeOptions="actionUnspecified"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <CheckBox
+                    android:id="@+id/checkbox_one"
+                    style="@style/CheckBoxStyle"
+                    android:text="Subscribe"
+                    android:visibility="gone"/>
 
             </LinearLayout>
 

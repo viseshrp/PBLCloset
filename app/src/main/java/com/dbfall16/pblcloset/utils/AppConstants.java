@@ -29,7 +29,7 @@ public class AppConstants {
     public static final String ERROR = "error";
 
     public static final String USER_TYPE = "user_type";
-    public static final String USER_TYPE_BUYER = "buyer";
+    public static final String USER_TYPE_BUYER = "cust";
     public static final String USER_TYPE_DONOR = "donor";
     public static final String USER_TYPE_UNREG = "unreg";
 
