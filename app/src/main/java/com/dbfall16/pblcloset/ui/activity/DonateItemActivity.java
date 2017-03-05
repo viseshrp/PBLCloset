@@ -33,6 +33,7 @@ import com.android.volley.error.VolleyError;
 import com.dbfall16.pblcloset.PBLApp;
 import com.dbfall16.pblcloset.R;
 import com.dbfall16.pblcloset.models.Item;
+import com.dbfall16.pblcloset.models.PblResponse;
 import com.dbfall16.pblcloset.models.User;
 import com.dbfall16.pblcloset.utils.AppConstants;
 import com.dbfall16.pblcloset.utils.MsgUtils;
@@ -112,7 +113,6 @@ public class DonateItemActivity extends AppCompatActivity {
         Display display = getWindowManager().getDefaultDisplay();
         mSize = new Point();
         display.getSize(mSize);
-
 
         userId = PreferencesUtils.getString(this, AppConstants.USER_ID, "");
 
@@ -357,11 +357,12 @@ public class DonateItemActivity extends AppCompatActivity {
             try {
                 // Simulate network access.
                 if (NetworkUtil.getConnectivityStatusString(DonateItemActivity.this)) {
-                    PBLApp.get().getPblApi().donate(userId, description, color, itemType, size, brand, picture_url, new Response.Listener<Item>() {
+                    PBLApp.get().getPblApi().donate(((int)Double.parseDouble(userId))+"", description, color, itemType, size, brand, picture_url, new Response.Listener<PblResponse>() {
                         @Override
-                        public void onResponse(Item response) {
+                        public void onResponse(PblResponse response) {
                             if (response != null) {
                                 isSuccess = true;
+                                onResponseOne(isSuccess);
                             }
                         }
                     }, new Response.ErrorListener() {
@@ -386,6 +387,10 @@ public class DonateItemActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
+
+        }
+
+        void onResponseOne(Boolean success){
             mDonateItemTask = null;
             showProgress(false);
 

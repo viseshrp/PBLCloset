@@ -35,6 +35,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +51,9 @@ import com.dbfall16.pblcloset.utils.NetworkUtil;
 import com.dbfall16.pblcloset.utils.PreferencesUtils;
 import com.dbfall16.pblcloset.utils.UserSessionUtils;
 import com.dbfall16.pblcloset.utils.ValidationUtils;
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.reflect.TypeToken;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -407,15 +411,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 // Simulate network access.
                 if (NetworkUtil.getConnectivityStatusString(LoginActivity.this)) {
                     PBLApp.get().getPblApi().login(mEmail,
-                            mPassword, new Response.Listener<User>() {
+                            mPassword, new Response.Listener<PblResponse>() {
                                 @Override
-                                public void onResponse(User response) {
+                                public void onResponse(PblResponse response) {
                                     if (response != null) {
                                         //if (response.getStatus().equals(AppConstants.SUCCESS)) {
                                         isSuccess = true;
-                                        Log.e("success", "success");
-                                        MsgUtils.displayToast(LoginActivity.this, "Welcome" + " " + response.getFirstName());
-                                        saveData(response);
+//                                        Log.e("success", "success");
+//                                        User user = (User) response.getResponse();
+//                                        MsgUtils.displayToast(LoginActivity.this, "Welcome" + " " + user.getFirstName());
+//                                        saveData(user);
+
+                                        Gson gson = new Gson();
+                                        String c = new Gson().toJson(response.getResponse(), LinkedTreeMap.class);
+                                        Type type = new TypeToken<User>(){}.getType();
+                                        User user = gson.fromJson(c,type);
+                                        Log.d("User",user.getEmail());
+                                        //User user = (User) response.getResponse();
+                                        MsgUtils.displayToast(LoginActivity.this, "Welcome" + " " + user.getFirstName());
+                                        saveData(user);
+                                        onSignUpResponse(isSuccess);
                                         /*} else {
                                             MsgUtils.displayToast(LoginActivity.this, response.getMessage());
                                         }*/
@@ -447,7 +462,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
+
+        }
+
+        void onSignUpResponse(Boolean success){
+            mSignupTask = null;
             showProgress(false);
 
             if (success) {
@@ -644,10 +663,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                     if (response != null) {
                                         //if (response.getStatus().equals(AppConstants.SUCCESS)) {
                                         isSuccess = true;
+
                                         Log.e("success", "success");
-                                        User user = (User) response.getResponse();
+                                        Gson gson = new Gson();
+                                        String c = new Gson().toJson(response.getResponse(), LinkedTreeMap.class);
+                                        Type type = new TypeToken<User>(){}.getType();
+                                        User user = gson.fromJson(c,type);
+                                        Log.d("User",user.getEmail());
+                                        //User user = (User) response.getResponse();
                                         MsgUtils.displayToast(LoginActivity.this, "Welcome" + " " + user.getFirstName());
                                         saveData(user);
+                                        onSignUpResponse(isSuccess);
                                         /*} else {
                                             MsgUtils.displayToast(LoginActivity.this, response.getMessage());
                                         }*/
@@ -688,6 +714,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected void onPostExecute(final Boolean success) {
+
+        }
+
+        void onSignUpResponse(Boolean success){
             mSignupTask = null;
             showProgress(false);
 
@@ -715,6 +745,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+    @Override
+    public void onBackPressed() {
 
+    }
 }
 

@@ -6,8 +6,10 @@ import com.android.volley.error.AuthFailureError;
 import com.android.volley.error.NetworkError;
 import com.dbfall16.pblcloset.models.Item;
 import com.dbfall16.pblcloset.models.ItemList;
+import com.dbfall16.pblcloset.models.PblResponse;
 import com.dbfall16.pblcloset.parsers.ItemListParser;
 import com.dbfall16.pblcloset.parsers.ItemParser;
+import com.dbfall16.pblcloset.parsers.PblResponseParser;
 import com.dbfall16.pblcloset.utils.APIConstants;
 
 import java.nio.charset.Charset;
@@ -16,12 +18,12 @@ import java.nio.charset.Charset;
  * Created by viseshprasad on 12/8/16.
  */
 
-public class DonateItemApi extends AppRequest<Item> {
+public class DonateItemApi extends AppRequest<PblResponse> {
 
     public DonateItemApi(String userId, String description, String color, String itemType, String size,
-                         String brand, String picture, Response.Listener<Item> listener,
+                         String brand, String picture, Response.Listener<PblResponse> listener,
                          Response.ErrorListener errorListener) {
-        super(Method.POST, APIConstants.GET_DONATED_LIST_URL, listener, errorListener);
+        super(Method.POST, APIConstants.DONATE_ITEM_URL, listener, errorListener);
         setShouldCache(false);
         setPriority(Priority.IMMEDIATE);
 
@@ -35,10 +37,10 @@ public class DonateItemApi extends AppRequest<Item> {
     }
 
     @Override
-    protected Response<Item> parseNetworkResponse(NetworkResponse response) {
+    protected Response<PblResponse> parseNetworkResponse(NetworkResponse response) {
         if (response.statusCode == 200) {
-            Item item = new ItemParser(new String(response.data, Charset.forName("UTF-8"))).getParserResponse();
-            return Response.success(item, null);
+            PblResponse pblResponse = new PblResponseParser(new String(response.data, Charset.forName("UTF-8"))).getParserResponse();
+            return Response.success(pblResponse, null);
         } else if (response.statusCode == 401) {
             return Response.error(new AuthFailureError());
         } else {

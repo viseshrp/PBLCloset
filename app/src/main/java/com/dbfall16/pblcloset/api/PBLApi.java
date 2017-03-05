@@ -20,7 +20,7 @@ public class PBLApi {
     }
 
 
-    public Request<?> login(String email, String password, Response.Listener<User> listener,
+    public Request<?> login(String email, String password, Response.Listener<PblResponse> listener,
                             Response.ErrorListener errorListener) {
         return mRequestQueue.add(new LoginApi(email, password, listener, errorListener));
     }
@@ -32,13 +32,13 @@ public class PBLApi {
                 subscription, listener, errorListener));
     }
 
-    public Request<?> getDonatedList(String userId, Response.Listener<ItemList> listener,
+    public Request<?> getDonatedList(String userId, Response.Listener<PblResponse> listener,
                                      Response.ErrorListener errorListener) {
         return mRequestQueue.add(new DonatedListApi(userId, listener, errorListener));
     }
 
     public Request<?> donate(String userId, String description, String color, String itemType, String size,
-                             String brand, String picture, Response.Listener<Item> listener,
+                             String brand, String picture, Response.Listener<PblResponse> listener,
                              Response.ErrorListener errorListener) {
         return mRequestQueue.add(new DonateItemApi(userId, description, color, itemType, size, brand, picture, listener, errorListener));
     }

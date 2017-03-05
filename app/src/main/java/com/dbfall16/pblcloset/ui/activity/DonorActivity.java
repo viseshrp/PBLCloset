@@ -29,13 +29,20 @@ import com.dbfall16.pblcloset.R;
 import com.dbfall16.pblcloset.adapters.DonorItemsAdapter;
 import com.dbfall16.pblcloset.models.Item;
 import com.dbfall16.pblcloset.models.ItemList;
+import com.dbfall16.pblcloset.models.PblResponse;
+import com.dbfall16.pblcloset.models.User;
 import com.dbfall16.pblcloset.ui.views.MyRecyclerView;
 import com.dbfall16.pblcloset.utils.AppConstants;
 import com.dbfall16.pblcloset.utils.MsgUtils;
 import com.dbfall16.pblcloset.utils.NetworkUtil;
 import com.dbfall16.pblcloset.utils.PreferencesUtils;
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -220,18 +227,31 @@ public class DonorActivity extends AppCompatActivity {
             try {
                 if (NetworkUtil.getConnectivityStatusString(context)) {
                     //enableNoInternetView(false);
-                    PBLApp.get().getPblApi().getDonatedList(userId, new Response.Listener<ItemList>() {
+                    PBLApp.get().getPblApi().getDonatedList(((int)Double.parseDouble(userId))+"", new Response.Listener<PblResponse>() {
                         @Override
-                        public void onResponse(ItemList response) {
+                        public void onResponse(PblResponse response) {
                             showProgress(false);
-                            if (response != null && response.getItemList() != null && !response.getItemList().isEmpty()) {
+                            Gson gson = new Gson();
+                            String c = new Gson().toJson(response.getResponse(), List.class);
+                            Log.d("C message",c+"");
+                            Type type = new TypeToken<List<Item>>(){}.getType();
+                            /*ItemList itemList = gson.fromJson(c,type);
+                            ItemList itemList = new ItemList();
+                            ArrayList<Item> items = new ArrayList<Item>();*/
+                            ItemList itemList = new ItemList();
+                            itemList.setItemList((ArrayList<Item>)gson.fromJson(c,type));
+
+                            //itemList.getItemList().addAll((List<Item>) response.getResponse());
+                            //ItemList itemList = (ItemList) response.getResponse();
+                            if (response != null && itemList.getItemList() != null && !itemList.getItemList().isEmpty()) {
                                 isSuccess = true;
-                                setDataset(response.getItemList());
+                                setDataset(itemList.getItemList());
                             } else {
                                 //showProgress(false);
                                 //showEmptyList(true);
                                 isSuccess = false;
                             }
+                            onResponseOne(isSuccess);
                         }
                     }, new Response.ErrorListener() {
                         @Override
@@ -245,6 +265,7 @@ public class DonorActivity extends AppCompatActivity {
                                 MsgUtils.displayToast(context, R.string.error_generic);
                                 isSuccess = false;
                             }
+                            onResponseOne(false);
                         }
                     });
                 } else {
@@ -252,6 +273,7 @@ public class DonorActivity extends AppCompatActivity {
                     //showProgress(false);
                     //enableNoInternetView(true);
                     MsgUtils.displayToast(context, R.string.error_internet_unavailable);
+                    onResponseOne(false);
                 }
 
                 Thread.sleep(2000);
@@ -263,6 +285,17 @@ public class DonorActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
+
+        }
+
+        @Override
+        protected void onCancelled() {
+            downloadDonatedList = null;
+            numberOfRetries = -1;
+            showProgress(false);
+        }
+
+        void onResponseOne(boolean success){
             downloadDonatedList = null;
             showProgress(false);
 
@@ -275,13 +308,6 @@ public class DonorActivity extends AppCompatActivity {
                     MsgUtils.displayToast(context, R.string.error_generic);
                 }
             }
-        }
-
-        @Override
-        protected void onCancelled() {
-            downloadDonatedList = null;
-            numberOfRetries = -1;
-            showProgress(false);
         }
     }
 }

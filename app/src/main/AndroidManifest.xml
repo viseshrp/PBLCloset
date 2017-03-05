@@ -48,7 +48,8 @@
             android:exported="true"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.activity.MainActivity" />
+        <activity android:name=".ui.activity.MainActivity"
+            android:exported="true"/>
         <activity
             android:name=".ui.activity.DonorActivity"
             android:exported="true"
@@ -59,6 +60,9 @@
             android:exported="true"
             android:label="@string/activity_add_item" />
         <activity android:name="com.desmond.squarecamera.CameraActivity" />
+        <activity android:name=".naveen.Main2Activity" />
+        <activity android:name=".naveen.CartActivity" />
+        <activity android:name=".naveen.CheckOutActivity"></activity>
     </application>
 
 </manifest>

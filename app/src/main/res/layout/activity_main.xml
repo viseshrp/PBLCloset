@@ -10,4 +10,56 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.dbfall16.pblcloset.ui.activity.MainActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/welcomeText"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/filterText"
+        android:layout_toStartOf="@+id/filterText" />
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="30dp"
+        android:id="@+id/filterButton"
+        android:layout_alignTop="@+id/welcomeText"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/downarrow"
+        android:visibility="invisible" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/filterLabel"
+        android:id="@+id/filterText"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/filterButton"
+        android:layout_toStartOf="@+id/filterButton"
+        android:layout_alignBottom="@+id/filterButton"
+        android:layout_gravity="bottom"
+        android:gravity="center_vertical"
+        android:layout_marginRight="5dp"
+        android:visibility="invisible" />
+
+    <GridView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/itemsGrid"
+        android:layout_below="@+id/filterButton"
+        android:layout_alignRight="@+id/filterButton"
+        android:layout_alignEnd="@+id/filterButton"
+        android:choiceMode="singleChoice"
+        android:columnWidth="150dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center"/>
+
 </RelativeLayout>
